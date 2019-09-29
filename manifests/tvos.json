@@ -1,0 +1,50 @@
+{
+  "api": {
+    "require_startup_execution": false,
+    "modules": []
+  },
+  "react_native": true,
+  "dependency_repository_url": [],
+  "dependency_name": "@applicaster/quick-brick-adobe-login-plugin",
+  "dependency_version": "0.0.1",
+  "platform": "tvos",
+  "author_name": "Manuel Pretelin",
+  "author_email": "m.pretelin@applicaster.com",
+  "manifest_version": "0.0.1",
+  "name": "QB Adobe Login Plugin",
+  "description": "QB Adobe Login Plugin",
+  "type": "general",
+  "screen": true,
+  "identifier": "qb-adobe-login-plugin",
+  "ui_builder_support": true,
+  "whitelisted_account_ids": [
+    "59c02d2e06b8470013f125b9"
+  ],
+  "min_zapp_sdk": "10.0.3",
+  "deprecated_since_zapp_sdk": "",
+  "unsupported_since_zapp_sdk": "",
+  "general": {
+    "fields": [
+      {
+        "type": "switch",
+        "key": "is_flow_blocker",
+        "tooltip_text": "Define if hook will block flow in case cancelation",
+        "initial_value": true
+      },
+      {
+        "type": "switch",
+        "key": "allow_screen_plugin_presentation",
+        "tooltip_text": "Define if",
+        "initial_value": true
+      }
+    ]
+  },
+  "custom_configuration_fields": [
+    {
+      "key": "expected_token",
+      "type": "text",
+      "tooltip_text": "sets the value the plugin expects to simulate a valid login"
+    }
+  ],
+  "targets": ["tv"]
+}
