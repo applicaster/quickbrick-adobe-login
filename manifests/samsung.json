@@ -6,11 +6,11 @@
   "react_native": true,
   "dependency_repository_url": [],
   "dependency_name": "@applicaster/quick-brick-adobe-login-plugin",
-  "dependency_version": "0.0.1",
+  "dependency_version": "0.0.3",
   "platform": "samsung_tv",
   "author_name": "Manuel Pretelin",
   "author_email": "m.pretelin@applicaster.com",
-  "manifest_version": "0.0.1",
+  "manifest_version": "0.0.3",
   "name": "QB Adobe Login Plugin",
   "description": "QB Adobe Login Plugin",
   "type": "general",
@@ -23,27 +23,36 @@
   "min_zapp_sdk": "1.0.0",
   "deprecated_since_zapp_sdk": "",
   "unsupported_since_zapp_sdk": "",
-  "general": {
-    "fields": [
-      {
-        "type": "switch",
-        "key": "is_flow_blocker",
-        "tooltip_text": "Define if hook will block flow in case cancelation",
-        "initial_value": true
-      },
-      {
-        "type": "switch",
-        "key": "allow_screen_plugin_presentation",
-        "tooltip_text": "Define if",
-        "initial_value": true
-      }
-    ]
-  },
   "custom_configuration_fields": [
     {
-      "key": "expected_token",
       "type": "text",
-      "tooltip_text": "sets the value the plugin expects to simulate a valid login"
+      "key": "environment_url",
+      "tooltip_text": "The environment URL"
+    },
+    {
+      "type": "text",
+      "key": "resource_id",
+      "tooltip_text": "The resource ID to authorizing"
+    },
+    {
+      "type": "text",
+      "key": "requestor_id",
+      "tooltip_text": "The requestor ID of the user's Adobe Access Enabler account"
+    },
+    {
+      "type": "text",
+      "key": "secret",
+      "tooltip_text": "The secret of the user's Adobe Access Enabler account"
+    },
+    {
+      "type": "text",
+      "key": "public_key",
+      "tooltip_text": "The public key of the user's Adobe Access Enabler account"
+    },
+    {
+      "type": "text",
+      "key": "registration_url",
+      "tooltip_text": "The registration url the user will go in the browser to authenticate in the app."
     }
   ],
   "targets": ["tv"]
