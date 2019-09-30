@@ -4,6 +4,8 @@ import CryptoJS from 'crypto-js';
 import axios from 'axios'
 import { getAppData } from "@applicaster/zapp-react-native-bridge/QuickBrick";
 import { uuidv4 } from './utils/index';
+import LoadingScreen from './screens/LoadingScreen';
+import IntroScreen from './screens/IntroScreen';
 
 const { height } = Dimensions.get('window');
 
@@ -12,14 +14,20 @@ const STAGING_URL = "api.auth-staging.adobe.com"
 class AdobeLoginComponent extends Component {
   constructor(props) {
     super(props);
-    this.state = {};
 
+    this.state = {
+      screen: 'INTRO',
+      userName: ''
+    };
+
+    this.renderScreen = this.renderScreen.bind(this);
     this.getAdobeAuthorizationHeader = this.getAdobeAuthorizationHeader.bind(this);
     this.getRegistrationCode = this.getRegistrationCode.bind(this);
+    this.goToScreen = this.goToScreen.bind(this);
   }
 
   getAdobeAuthorizationHeader(verb, requestorId, requestUri, publicKey, secretKey) {
-    const authorizationParams = 
+    const authorizationParams =
       `${verb} requestor_id=${requestorId}, nonce=${uuidv4()}, signature_method=HMAC-SHA1, request_time=${Date.now()}, request_uri=${requestUri}`;
 
     const secretKeyEncoded = CryptoJS.enc.Utf8.parse(secretKey);
@@ -39,10 +47,10 @@ class AdobeLoginComponent extends Component {
       {
         headers: {
           "Authorization": this.getAdobeAuthorizationHeader(
-            'POST', 
-            'olychannel', 
-            '/regcode', 
-            'miwI0BXa2QWhCGG8vevnw9OK3x1bgv3h', 
+            'POST',
+            'olychannel',
+            '/regcode',
+            'miwI0BXa2QWhCGG8vevnw9OK3x1bgv3h',
             'WuVIyVeNagAXnzWO'
           )
         }
@@ -51,11 +59,30 @@ class AdobeLoginComponent extends Component {
     }).catch(err => console.log(err))
   }
 
+  goToScreen(screen) {
+    this.setState({
+      screen
+    })
+  }
+
+  renderScreen(screen) {
+    switch (screen) {
+      case 'LOADING': {
+        return <LoadingScreen
+          goToScreen={this.goToScreen}
+        />;
+      }
+      case 'INTRO': {
+        return <IntroScreen
+          goToScreen={this.goToScreen}
+        />;
+      }
+    }
+  }
+
   render() {
     return (
-      <View style={styles.container}>
-        <Text style={styles.text}>ADOBE</Text>
-      </View>
+      this.renderScreen(this.state.screen)
     );
   }
 }
