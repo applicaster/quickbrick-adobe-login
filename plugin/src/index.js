@@ -1,15 +1,10 @@
 import React, { Component } from 'react';
 import { View, Text, Dimensions } from 'react-native';
-import CryptoJS from 'crypto-js';
-import axios from 'axios'
-import { getAppData } from "@applicaster/zapp-react-native-bridge/QuickBrick";
-import { uuidv4 } from './utils/index';
 import LoadingScreen from './screens/LoadingScreen';
 import IntroScreen from './screens/IntroScreen';
+import SignInScreen from './screens/SignInScreen';
 
 const { height } = Dimensions.get('window');
-
-const STAGING_URL = "api.auth-staging.adobe.com"
 
 class AdobeLoginComponent extends Component {
   constructor(props) {
@@ -21,48 +16,7 @@ class AdobeLoginComponent extends Component {
     };
 
     this.renderScreen = this.renderScreen.bind(this);
-    this.getAdobeAuthorizationHeader = this.getAdobeAuthorizationHeader.bind(this);
-    this.getRegistrationCode = this.getRegistrationCode.bind(this);
     this.goToScreen = this.goToScreen.bind(this);
-  }
-
-  getAdobeAuthorizationHeader(verb, requestorId, requestUri, publicKey, secretKey) {
-    const authorizationParams =
-      `${verb} requestor_id=${requestorId}, nonce=${uuidv4()}, signature_method=HMAC-SHA1, request_time=${Date.now()}, request_uri=${requestUri}`;
-
-    const secretKeyEncoded = CryptoJS.enc.Utf8.parse(secretKey);
-    const contentEncoded = CryptoJS.enc.Utf8.parse(authorizationParams);
-
-    const signatureBytes = CryptoJS.HmacSHA1(contentEncoded, secretKeyEncoded);
-    const signatureBase64String = CryptoJS.enc.Base64.stringify(signatureBytes);
-
-    return `${authorizationParams}, public_key=${publicKey}, signature=${signatureBase64String}`
-  }
-
-  getRegistrationCode() {
-    const {
-      environment_url,
-      public_key,
-      requestor_id,
-      secret
-    } = this.props.screenData.general;
-
-    const params = new URLSearchParams();
-    params.append('deviceId', getAppData().uuid);
-
-    axios.post(`https://${environment_url}/reggie/v1/olychannel/regcode`, params,
-      {
-        headers: {
-          "Authorization": this.getAdobeAuthorizationHeader(
-            'POST',
-            requestor_id,
-            '/regcode',
-            public_key,
-            secret
-          )
-        }
-      }
-    ).catch(err => console.log(err))
   }
 
   goToScreen(screen) {
@@ -83,11 +37,17 @@ class AdobeLoginComponent extends Component {
           goToScreen={this.goToScreen}
         />;
       }
+      case 'SIGNIN': {
+        return <SignInScreen
+          goToScreen={this.goToScreen}
+          registrationUrl={this.props.screenData.general.registration_url}
+          screenData={this.props.screenData}
+        />
+      }
     }
   }
 
   render() {
-    console.log(this.props)
     return (
       this.renderScreen(this.state.screen)
     );
