@@ -40,23 +40,29 @@ class AdobeLoginComponent extends Component {
   }
 
   getRegistrationCode() {
+    const {
+      environment_url,
+      public_key,
+      requestor_id,
+      secret
+    } = this.props.screenData.general;
+
     const params = new URLSearchParams();
     params.append('deviceId', getAppData().uuid);
 
-    axios.post(`https://${STAGING_URL}/reggie/v1/olychannel/regcode`, params,
+    axios.post(`https://${environment_url}/reggie/v1/olychannel/regcode`, params,
       {
         headers: {
           "Authorization": this.getAdobeAuthorizationHeader(
             'POST',
-            'olychannel',
+            requestor_id,
             '/regcode',
-            'miwI0BXa2QWhCGG8vevnw9OK3x1bgv3h',
-            'WuVIyVeNagAXnzWO'
+            public_key,
+            secret
           )
         }
       }
-    ).then(() => {
-    }).catch(err => console.log(err))
+    ).catch(err => console.log(err))
   }
 
   goToScreen(screen) {
@@ -81,6 +87,7 @@ class AdobeLoginComponent extends Component {
   }
 
   render() {
+    console.log(this.props)
     return (
       this.renderScreen(this.state.screen)
     );
