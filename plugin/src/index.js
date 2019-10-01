@@ -1,17 +1,21 @@
 import React, { Component } from 'react';
-import { View, Text, Dimensions } from 'react-native';
+import { Dimensions } from 'react-native';
 import LoadingScreen from './screens/LoadingScreen';
 import IntroScreen from './screens/IntroScreen';
 import SignInScreen from './screens/SignInScreen';
+import WelcomeScreen from './screens/WelcomeScreen';
 
 const { height } = Dimensions.get('window');
+
+const NAMESPACE = 'adobe-login';
+const MVPD = 'adobe-mvpd'
 
 class AdobeLoginComponent extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      screen: 'INTRO',
+      screen: 'LOADING',
       userName: ''
     };
 
@@ -30,11 +34,13 @@ class AdobeLoginComponent extends Component {
       case 'LOADING': {
         return <LoadingScreen
           goToScreen={this.goToScreen}
+          screenData={this.props.screenData}
         />;
       }
       case 'INTRO': {
         return <IntroScreen
           goToScreen={this.goToScreen}
+          screenData={this.props.screenData}
         />;
       }
       case 'SIGNIN': {
@@ -42,7 +48,17 @@ class AdobeLoginComponent extends Component {
           goToScreen={this.goToScreen}
           registrationUrl={this.props.screenData.general.registration_url}
           screenData={this.props.screenData}
+          namespace={NAMESPACE}
+          mvpd={MVPD}
         />
+      }
+      case 'WELCOME': {
+        return <WelcomeScreen
+          goToScreen={this.goToScreen}
+          screenData={this.props.screenData}
+          namespace={NAMESPACE}
+          mvpd={MVPD}
+        />;
       }
     }
   }
