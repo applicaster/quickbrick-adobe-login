@@ -1,9 +1,9 @@
 import * as React from "react";
 import axios from "axios";
-import CryptoJS from 'crypto-js';
 import { View, Text, ActivityIndicator } from "react-native";
 import { getAppData } from "@applicaster/zapp-react-native-bridge/QuickBrick";
-import { uuidv4 } from '../utils/index';
+import { localStorage } from "@applicaster/zapp-react-native-bridge/ZappStorage/LocalStorage";
+import { getAdobeAuthorizationHeader } from '../utils/index';
 import Layout from "../components/Layout"
 import QRCode from "../components/QRCode"
 
@@ -17,26 +17,43 @@ class SignInScreen extends React.Component {
       loading: true
     };
 
-    //    this.getSignInStatus = this.getSignInStatus.bind(this);
-    this.getAdobeAuthorizationHeader = this.getAdobeAuthorizationHeader.bind(this);
     this.getRegistrationCode = this.getRegistrationCode.bind(this);
+    this.getAuthn = this.getAuthn.bind(this);
   }
 
   componentDidMount() {
     this.getRegistrationCode()
   }
 
-  getAdobeAuthorizationHeader(verb, requestorId, requestUri, publicKey, secretKey) {
-    const authorizationParams =
-      `${verb} requestor_id=${requestorId}, nonce=${uuidv4()}, signature_method=HMAC-SHA1, request_time=${Date.now()}, request_uri=${requestUri}`;
+  getAuthn() {
+    const {
+      environment_url,
+      requestor_id,
+      public_key,
+      secret
+    } = this.props.screenData.general
 
-    const secretKeyEncoded = CryptoJS.enc.Utf8.parse(secretKey);
-    const contentEncoded = CryptoJS.enc.Utf8.parse(authorizationParams);
-
-    const signatureBytes = CryptoJS.HmacSHA1(contentEncoded, secretKeyEncoded);
-    const signatureBase64String = CryptoJS.enc.Base64.stringify(signatureBytes);
-
-    return `${authorizationParams}, public_key=${publicKey}, signature=${signatureBase64String}`
+    axios.get(`https://${environment_url}/api/v1/tokens/authn?deviceId=${getAppData().uuid}&requestor=${requestor_id}`,
+      {
+        headers: {
+          "Authorization": getAdobeAuthorizationHeader(
+            'POST',
+            requestor_id,
+            '/authn',
+            public_key,
+            secret
+          )
+        }
+      })
+      .then(async res => {
+        await localStorage.setItem(
+          this.props.mvpd,
+          res.data.mvpd,
+          this.props.namespace
+        )
+        this.props.goToScreen('WELCOME')
+      })
+      .catch(err => console.log(err))
   }
 
   getRegistrationCode() {
@@ -53,7 +70,7 @@ class SignInScreen extends React.Component {
     axios.post(`https://${environment_url}/reggie/v1/olychannel/regcode`, params,
       {
         headers: {
-          "Authorization": this.getAdobeAuthorizationHeader(
+          "Authorization": getAdobeAuthorizationHeader(
             'POST',
             requestor_id,
             '/regcode',
@@ -67,7 +84,7 @@ class SignInScreen extends React.Component {
         devicePinCode: res.data.code,
         loading: false
       }, () => this.heartbeat = setInterval(() => {
-        console.log('HEARBEAT')
+        this.getAuthn()
       }, HEARBEAT_INTERVAL));
     })
       .catch(err => console.log(err))
@@ -76,37 +93,6 @@ class SignInScreen extends React.Component {
   componentWillUnmount() {
     clearInterval(this.heartbeat)
   }
-
-  /*   getSignInStatus() {
-      axios.get(`https://dwettnsyyj.execute-api.eu-west-1.amazonaws.com/Prod/registration/api/Device/GetDeviceByPin/${this.state.devicePinCode}`,
-        {
-          headers: {
-            "accept": "application/json"
-          }
-        }
-      ).then(async response => {
-        if (response.data.access_token) {
-          await localStorage.setItem(
-            this.props.token,
-            response.data.access_token,
-            this.props.namespace
-          )
-  
-          await localStorage.setItem(
-            this.props.userName,
-            response.data.firstname,
-            this.props.namespace
-          )
-  
-          if (this.props.isPrehook) {
-            this.props.closeHook({ success: true })
-          } else {
-            this.props.goToScreen('WELCOME')
-          }
-  
-        }
-      }).catch(err => console.log(err))
-    } */
 
   render() {
     return (
