@@ -23,7 +23,7 @@ class LoadingScreen extends React.Component {
       {
         headers: {
           "Authorization": getAdobeAuthorizationHeader(
-            'POST',
+            'GET',
             requestor_id,
             '/authn',
             public_key,
@@ -34,12 +34,12 @@ class LoadingScreen extends React.Component {
       .then(async res => {
         if (res.status === 200) {
           this.props.goToScreen('WELCOME')
-
-        } else {
-          this.props.goToScreen('SIGNIN')
         }
       })
-      .catch(err => console.log(err))
+      .catch(err => { 
+        console.log(err);
+        this.props.goToScreen('INTRO')
+      })
   }
 
   render() {

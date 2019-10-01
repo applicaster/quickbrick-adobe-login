@@ -31,7 +31,7 @@ class WelcomeScreen extends React.Component {
       {
         headers: {
           "Authorization": getAdobeAuthorizationHeader(
-            'POST',
+            'GET',
             requestor_id,
             '/authn',
             public_key,
@@ -52,25 +52,29 @@ class WelcomeScreen extends React.Component {
   }
 
   handleSignOut() {
-    axios.post('https://dwettnsyyj.execute-api.eu-west-1.amazonaws.com/Prod/registration/api/Device/Logout',
-      {
-        "access_token": this.props.accessToken
-      },
+    const {
+      environment_url,
+      requestor_id,
+      public_key,
+      secret
+    } = this.props.screenData.general
+
+    axios.delete(`https://${environment_url}/api/v1/logout?deviceId=${getAppData().uuid}`,
       {
         headers: {
-          "accept": "application/json",
-          "Content-Type": "application/json"
+          "Authorization": getAdobeAuthorizationHeader(
+            'GET',
+            requestor_id,
+            '/logout',
+            public_key,
+            secret
+          )
         }
       }
     ).then(async response => {
-      if (response.data.succeeded) {
-        localStorage.setItem(
-          this.props.token,
-          'NOT_SET',
-          this.props.namespace
-        )
-
-        this.props.goToScreen('INTRO') 
+      console.log(response, 'LOGOUT')
+      if (response.status === 204) {
+        this.props.goToScreen('LOADING')
       }
     }).catch(err => console.log(err))
   }
@@ -80,7 +84,7 @@ class WelcomeScreen extends React.Component {
       <Layout>
         <View style={styles.container}>
           <Text style={styles.text}>You've signed in with your TV Provider: </Text>
-          <Text style={{...styles.text, textAlign: 'center', fontWeight: 'bold'}}>{this.state.mvpd}</Text>
+          <Text style={{ ...styles.text, textAlign: 'center', fontWeight: 'bold' }}>{this.state.mvpd}</Text>
           <FocusableGroup id={'sign-in-button'} style={styles.buttonContainer}>
             <Button
               label="Sign Out"
