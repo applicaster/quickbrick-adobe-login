@@ -3,7 +3,6 @@ import axios from "axios";
 import { View, Text } from "react-native";
 import { getAppData } from "@applicaster/zapp-react-native-bridge/QuickBrick";
 import { FocusableGroup } from "@applicaster/zapp-react-native-ui-components/Components/FocusableGroup";
-import { localStorage } from "@applicaster/zapp-react-native-bridge/ZappStorage/LocalStorage";
 import { getAdobeAuthorizationHeader } from '../utils/index';
 import Button from "../components/Button";
 import Layout from "../components/Layout";
@@ -72,7 +71,6 @@ class WelcomeScreen extends React.Component {
         }
       }
     ).then(async response => {
-      console.log(response, 'LOGOUT')
       if (response.status === 204) {
         this.props.goToScreen('LOADING')
       }
