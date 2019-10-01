@@ -1,0 +1,59 @@
+{
+  "api": {
+    "require_startup_execution": false,
+    "modules": []
+  },
+  "react_native": true,
+  "dependency_repository_url": [],
+  "dependency_name": "@applicaster/quick-brick-adobe-login-plugin",
+  "dependency_version": "0.0.6",
+  "platform": "android_tv",
+  "author_name": "Manuel Pretelin",
+  "author_email": "m.pretelin@applicaster.com",
+  "manifest_version": "0.0.6",
+  "name": "QB Adobe Login Plugin",
+  "description": "QB Adobe Login Plugin",
+  "type": "general",
+  "screen": true,
+  "identifier": "qb-adobe-login-plugin",
+  "ui_builder_support": true,
+  "whitelisted_account_ids": [
+    "59c02d2e06b8470013f125b9"
+  ],
+  "min_zapp_sdk": "2.0.0",
+  "deprecated_since_zapp_sdk": "",
+  "unsupported_since_zapp_sdk": "",
+  "custom_configuration_fields": [
+    {
+      "type": "text",
+      "key": "environment_url",
+      "tooltip_text": "The environment URL"
+    },
+    {
+      "type": "text",
+      "key": "resource_id",
+      "tooltip_text": "The resource ID to authorizing"
+    },
+    {
+      "type": "text",
+      "key": "requestor_id",
+      "tooltip_text": "The requestor ID of the user's Adobe Access Enabler account"
+    },
+    {
+      "type": "text",
+      "key": "secret",
+      "tooltip_text": "The secret of the user's Adobe Access Enabler account"
+    },
+    {
+      "type": "text",
+      "key": "public_key",
+      "tooltip_text": "The public key of the user's Adobe Access Enabler account"
+    },
+    {
+      "type": "text",
+      "key": "registration_url",
+      "tooltip_text": "The registration url the user will go in the browser to authenticate in the app."
+    }
+  ],
+  "targets": ["tv"]
+}
