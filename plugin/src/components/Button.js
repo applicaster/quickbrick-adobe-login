@@ -2,9 +2,9 @@ import * as React from "react";
 import { View, Text } from "react-native";
 import { Focusable } from "@applicaster/zapp-react-native-ui-components/Components/Focusable";
 
-export default function Button({ label, groupId, onPress }) {
+export default function Button({ label, groupId, onPress, preferredFocus}) {
   return (
-    <Focusable id={`oc-login-${label}`} groupId={groupId} onPress={onPress}>
+    <Focusable id={`oc-login-${label}`} groupId={groupId} onPress={onPress} preferredFocus={preferredFocus}>
       {focused => {
         const buttonStyles = styles[focused ? "focused" : "default"];
         return (
