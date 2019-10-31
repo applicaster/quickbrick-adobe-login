@@ -30,17 +30,33 @@ class AdobeLoginComponent extends Component {
   }
 
   renderScreen(screen) {
+    const groupId = () => {
+      if (this.props.screenData) {
+        return this.props.screenData.groupId;
+      }  
+      if (this.props.payload) {
+        return this.props.payload.groupId
+      } 
+      return '';
+    }
+
+    const segmentKey = this.props.configuration ? this.props.configuration.segment_key : "7g6t2YcCLJJB5UUuIKhtWxd6Sg8x652M"
+
     switch (screen) {
       case 'LOADING': {
         return <LoadingScreen
           goToScreen={this.goToScreen}
           screenData={this.props.screenData}
+          groupId={groupId()}
+          segmentKey={segmentKey}
         />;
       }
       case 'INTRO': {
         return <IntroScreen
           goToScreen={this.goToScreen}
           screenData={this.props.screenData}
+          groupId={groupId()}
+          segmentKey={segmentKey}
         />;
       }
       case 'SIGNIN': {
@@ -50,6 +66,8 @@ class AdobeLoginComponent extends Component {
           screenData={this.props.screenData}
           namespace={NAMESPACE}
           mvpd={MVPD}
+          groupId={groupId()}
+          segmentKey={segmentKey}
         />
       }
       case 'WELCOME': {
@@ -58,6 +76,8 @@ class AdobeLoginComponent extends Component {
           screenData={this.props.screenData}
           namespace={NAMESPACE}
           mvpd={MVPD}
+          groupId={groupId()}
+          segmentKey={segmentKey}
         />;
       }
     }
