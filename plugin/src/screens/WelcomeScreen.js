@@ -19,6 +19,8 @@ class WelcomeScreen extends React.Component {
   }
 
   componentDidMount() {
+    trackEvent(this.props.segmentKey, "Welcome");
+
     const {
       environment_url,
       requestor_id,

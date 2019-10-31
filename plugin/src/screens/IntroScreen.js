@@ -1,10 +1,15 @@
 import * as React from "react";
 import { View, Text } from "react-native";
 import { FocusableGroup } from "@applicaster/zapp-react-native-ui-components/Components/FocusableGroup";
+import { trackEvent } from "../analytics/segment/index";
 import Button from "../components/Button";
 import Layout from "../components/Layout";
 
 class IntroScreen extends React.Component {
+  componentDidMount() {
+    trackEvent(this.props.segmentKey, "Entry");
+  }
+
   render() {
     return (
       <Layout>
@@ -17,7 +22,12 @@ class IntroScreen extends React.Component {
           </Text>
           <Text style={styles.subTitle}>(US Only)</Text>
           <View style={styles.buttonContainer}>
-            <FocusableGroup id={'sign-in-button'} style={styles.focusBtnContainer} preferredFocus={true}>
+            <FocusableGroup 
+              id={'sign-in-button'} 
+              style={styles.focusBtnContainer} 
+              preferredFocus={true}
+              groupId={this.props.groupId}
+            >
               <Button label="Sign In" groupId={'sign-in-button'} onPress={() => this.props.goToScreen("SIGNIN")} preferredFocus={true}/>
             </FocusableGroup>
           </View>

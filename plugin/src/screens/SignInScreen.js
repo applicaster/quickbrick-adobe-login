@@ -3,6 +3,7 @@ import axios from "axios";
 import { View, Text, ActivityIndicator } from "react-native";
 import { getAppData } from "@applicaster/zapp-react-native-bridge/QuickBrick";
 import { localStorage } from "@applicaster/zapp-react-native-bridge/ZappStorage/LocalStorage";
+import { trackEvent } from "../analytics/segment/index";
 import { getAdobeAuthorizationHeader } from '../utils/index';
 import Layout from "../components/Layout"
 import QRCode from "../components/QRCode"
@@ -22,6 +23,7 @@ class SignInScreen extends React.Component {
   }
 
   componentDidMount() {
+    trackEvent(this.props.segmentKey, "Waiting Page")
     this.getRegistrationCode()
   }
 
@@ -31,7 +33,7 @@ class SignInScreen extends React.Component {
       requestor_id,
       public_key,
       secret
-    } = this.props.screenData.general
+    } = this.props.screenData.general;
 
     axios.get(`https://${environment_url}/api/v1/tokens/authn?deviceId=${getAppData().uuid}&requestor=${requestor_id}`,
       {
@@ -46,6 +48,7 @@ class SignInScreen extends React.Component {
         }
       })
       .then(async res => {
+        console.log(res, 'ADOBE RESPONSE')
         await localStorage.setItem(
           this.props.mvpd,
           res.data.mvpd,
