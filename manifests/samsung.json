@@ -6,11 +6,11 @@
   "react_native": true,
   "dependency_repository_url": [],
   "dependency_name": "@applicaster/quick-brick-adobe-login-plugin",
-  "dependency_version": "0.0.8",
+  "dependency_version": "0.0.9",
   "platform": "samsung_tv",
   "author_name": "Manuel Pretelin",
   "author_email": "m.pretelin@applicaster.com",
-  "manifest_version": "0.0.8",
+  "manifest_version": "0.0.9",
   "name": "QB Adobe Login Plugin",
   "description": "QB Adobe Login Plugin",
   "type": "general",
@@ -53,6 +53,11 @@
       "type": "text",
       "key": "registration_url",
       "tooltip_text": "The registration url the user will go in the browser to authenticate in the app."
+    },
+    {
+      "type": "text",
+      "key": "segment_key",
+      "tooltip_text": "Segment Key"
     }
   ],
   "targets": ["tv"]

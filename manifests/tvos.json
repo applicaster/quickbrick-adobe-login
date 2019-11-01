@@ -53,6 +53,11 @@
       "type": "text",
       "key": "registration_url",
       "tooltip_text": "The registration url the user will go in the browser to authenticate in the app."
+    },
+    {
+      "type": "text",
+      "key": "segment_key",
+      "tooltip_text": "Segment Key"
     }
   ],
   "targets": ["tv"]
