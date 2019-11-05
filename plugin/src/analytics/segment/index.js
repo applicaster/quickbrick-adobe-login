@@ -13,7 +13,7 @@ function uuidv4() {
 }
 
 export function trackEvent(segmentKey, screen, payload = {}, previousPage = "") {
-
+  
   if (payload.accessToken) {
     userId = {
       "userId": payload.accessToken,

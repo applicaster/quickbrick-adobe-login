@@ -40,7 +40,9 @@ class AdobeLoginComponent extends Component {
       return '';
     }
 
-    const segmentKey = this.props.screenData ? this.props.screenData.segment_key : "7g6t2YcCLJJB5UUuIKhtWxd6Sg8x652M"
+    const segmentKey = this.props.screenData 
+      ? this.props.screenData.general.segment_key 
+      :  this.props.configuration.segment_key;
 
     switch (screen) {
       case 'LOADING': {
