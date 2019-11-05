@@ -13,9 +13,20 @@ function uuidv4() {
 }
 
 export function trackEvent(segmentKey, screen, payload = {}, previousPage = "") {
+
+  if (payload.accessToken) {
+    userId = {
+      "userId": payload.accessToken,
+    }
+  } else {
+    userId = {
+      "anonymousId": uuidv4(),
+    }
+  }
+
   axios.post(TRACK_URL,
     {
-      "anonymousId": uuidv4(),
+      ...userId,
       "event": `Adobe - ${screen}`,
       "properties": {
         "deviceType": Platform.OS,
@@ -26,11 +37,9 @@ export function trackEvent(segmentKey, screen, payload = {}, previousPage = "") 
       "timestamp": Date.now()
     },
     {
-      auth: {
-        username: segmentKey,
-      },
       headers: {
         "Content-Type": "application/json",
+        "Authorization": `Basic ${segmentKey}`
       }
     }
   ).then(response => {
@@ -38,7 +47,7 @@ export function trackEvent(segmentKey, screen, payload = {}, previousPage = "") 
   }).catch(err => console.log(err))
 }
 
-export function identifyUser(userName, accessToken, devicePinCode) {
+export function identifyUser(segmentKey, userName, accessToken, devicePinCode, previousPage) {
   axios.post(IDENTIFY_URL,
     {
       "userId": accessToken,
@@ -56,7 +65,7 @@ export function identifyUser(userName, accessToken, devicePinCode) {
     {
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Basic ${btoa(`${segmentKey}:`)}`
+        "Authorization": `Basic ${segmentKey}`
       }
     }
   ).then(response => {

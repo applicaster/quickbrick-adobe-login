@@ -4,6 +4,7 @@ import { View, Text } from "react-native";
 import { getAppData } from "@applicaster/zapp-react-native-bridge/QuickBrick";
 import { FocusableGroup } from "@applicaster/zapp-react-native-ui-components/Components/FocusableGroup";
 import { getAdobeAuthorizationHeader } from '../utils/index';
+import { trackEvent } from "../analytics/segment/index";
 import Button from "../components/Button";
 import Layout from "../components/Layout";
 
@@ -19,8 +20,6 @@ class WelcomeScreen extends React.Component {
   }
 
   componentDidMount() {
-    trackEvent(this.props.segmentKey, "Welcome");
-
     const {
       environment_url,
       requestor_id,
@@ -44,6 +43,8 @@ class WelcomeScreen extends React.Component {
         if (res.status === 200) {
           this.setState({
             mvpd: res.data.mvpd
+          }, () => {
+            trackEvent(this.props.segmentKey, "Welcome", { accessToken: res.data.mvpd });
           })
         } else {
           this.props.goToScreen('SIGNIN')
@@ -74,6 +75,7 @@ class WelcomeScreen extends React.Component {
       }
     ).then(async response => {
       if (response.status === 204) {
+        trackEvent(this.props.segmentKey, "SignOut", { accessToken: this.state.mvpd }, "Welcome");
         this.props.goToScreen('LOADING')
       }
     }).catch(err => console.log(err))

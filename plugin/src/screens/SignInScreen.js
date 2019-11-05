@@ -3,7 +3,7 @@ import axios from "axios";
 import { View, Text, ActivityIndicator } from "react-native";
 import { getAppData } from "@applicaster/zapp-react-native-bridge/QuickBrick";
 import { localStorage } from "@applicaster/zapp-react-native-bridge/ZappStorage/LocalStorage";
-import { trackEvent } from "../analytics/segment/index";
+import { trackEvent, identifyUser } from "../analytics/segment/index";
 import { getAdobeAuthorizationHeader } from '../utils/index';
 import Layout from "../components/Layout"
 import QRCode from "../components/QRCode"
@@ -48,7 +48,8 @@ class SignInScreen extends React.Component {
         }
       })
       .then(async res => {
-        console.log(res, 'ADOBE RESPONSE')
+        identifyUser(this.props.segmentKey, '', res.data.mvpd, this.state.devicePinCode, 'Sign In Page')
+        
         await localStorage.setItem(
           this.props.mvpd,
           res.data.mvpd,
