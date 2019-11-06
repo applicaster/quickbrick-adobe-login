@@ -5,6 +5,7 @@ import { getAppData } from "@applicaster/zapp-react-native-bridge/QuickBrick";
 import { localStorage } from "@applicaster/zapp-react-native-bridge/ZappStorage/LocalStorage";
 import { trackEvent, identifyUser } from "../analytics/segment/index";
 import { getAdobeAuthorizationHeader } from '../utils/index';
+import { uuidv4 } from "../utils";
 import Layout from "../components/Layout"
 import QRCode from "../components/QRCode"
 
@@ -35,7 +36,7 @@ class SignInScreen extends React.Component {
       secret
     } = this.props.screenData.general;
 
-    axios.get(`https://${environment_url}/api/v1/tokens/authn?deviceId=${getAppData().uuid}&requestor=${requestor_id}`,
+    axios.get(`https://${environment_url}/api/v1/tokens/authn?deviceId=${getAppData().uuid || uuidv4}&requestor=${requestor_id}`,
       {
         headers: {
           "Authorization": getAdobeAuthorizationHeader(
@@ -69,7 +70,7 @@ class SignInScreen extends React.Component {
     } = this.props.screenData.general;
 
     const params = new URLSearchParams();
-    params.append('deviceId', getAppData().uuid);
+    params.append('deviceId', (getAppData().uuid || uuidv4));
 
     axios.post(`https://${environment_url}/reggie/v1/olychannel/regcode`, params,
       {

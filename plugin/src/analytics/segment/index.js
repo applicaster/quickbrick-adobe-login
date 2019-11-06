@@ -1,16 +1,10 @@
 import axios from "axios";
 import { Platform } from "react-native";
 import { getAppData } from "@applicaster/zapp-react-native-bridge/QuickBrick";
+import { uuidv4 } from "../../utils";
 
 const TRACK_URL = "https://api.segment.io/v1/track"
 const IDENTIFY_URL = "https://api.segment.io/v1/identify"
-
-function uuidv4() {
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-    var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
-    return v.toString(16);
-  });
-}
 
 export function trackEvent(segmentKey, screen, payload = {}, previousPage = "") {
   
@@ -31,7 +25,7 @@ export function trackEvent(segmentKey, screen, payload = {}, previousPage = "") 
       "properties": {
         "deviceType": Platform.OS,
         "previousPage": previousPage,
-        "deviceId": getAppData().uuid,
+        "deviceId": getAppData().uuid || uuidv4(),
         payload
       },
       "timestamp": Date.now()
