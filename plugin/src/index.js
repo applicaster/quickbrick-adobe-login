@@ -1,11 +1,9 @@
 import React, { Component } from 'react';
-import { Dimensions } from 'react-native';
+import { sessionStorage } from "@applicaster/zapp-react-native-bridge/ZappStorage/SessionStorage";
 import LoadingScreen from './screens/LoadingScreen';
 import IntroScreen from './screens/IntroScreen';
 import SignInScreen from './screens/SignInScreen';
 import WelcomeScreen from './screens/WelcomeScreen';
-
-const { height } = Dimensions.get('window');
 
 const NAMESPACE = 'adobe-login';
 const MVPD = 'adobe-mvpd'
@@ -16,11 +14,20 @@ class AdobeLoginComponent extends Component {
 
     this.state = {
       screen: 'LOADING',
-      userName: ''
+      userName: '',
+      deviceId: ''
     };
 
     this.renderScreen = this.renderScreen.bind(this);
     this.goToScreen = this.goToScreen.bind(this);
+  }
+
+  componentDidMount() {
+    sessionStorage.getItem('uuid').then(deviceId => {
+      this.setState({
+        deviceId
+      })
+    })
   }
 
   goToScreen(screen) {
@@ -51,6 +58,7 @@ class AdobeLoginComponent extends Component {
           screenData={this.props.screenData}
           groupId={groupId()}
           segmentKey={segmentKey}
+          deviceId={this.state.deviceId}
         />;
       }
       case 'INTRO': {
@@ -68,6 +76,7 @@ class AdobeLoginComponent extends Component {
           screenData={this.props.screenData}
           namespace={NAMESPACE}
           mvpd={MVPD}
+          deviceId={this.state.deviceId}
           groupId={groupId()}
           segmentKey={segmentKey}
         />
@@ -87,23 +96,10 @@ class AdobeLoginComponent extends Component {
 
   render() {
     return (
-      this.renderScreen(this.state.screen)
+      this.state.deviceId ? this.renderScreen(this.state.screen) : null
     );
   }
 }
-
-const styles = {
-  container: {
-    flex: 1,
-    height,
-    alignItems: 'center',
-  },
-  text: {
-    color: "#525A5C",
-    fontSize: 32,
-    marginBottom: 20,
-  },
-};
 
 AdobeLoginComponent.displayName = 'AdobeLoginComponent';
 export default AdobeLoginComponent;

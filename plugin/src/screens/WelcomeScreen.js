@@ -3,6 +3,7 @@ import axios from "axios";
 import { View, Text } from "react-native";
 import { getAppData } from "@applicaster/zapp-react-native-bridge/QuickBrick";
 import { FocusableGroup } from "@applicaster/zapp-react-native-ui-components/Components/FocusableGroup";
+import { sessionStorage } from "@applicaster/zapp-react-native-bridge/ZappStorage/SessionStorage";
 import { getAdobeAuthorizationHeader } from '../utils/index';
 import { trackEvent } from "../analytics/segment/index";
 import Button from "../components/Button";
@@ -13,7 +14,7 @@ class WelcomeScreen extends React.Component {
     super(props);
 
     this.state = {
-      mvpd: ''
+      requestor: ''
     }
 
     this.handleSignOut = this.handleSignOut.bind(this);
@@ -27,7 +28,9 @@ class WelcomeScreen extends React.Component {
       secret
     } = this.props.screenData.general
 
-    axios.get(`https://${environment_url}/api/v1/tokens/authn?deviceId=${getAppData().uuid}&requestor=${requestor_id}`,
+    const deviceId = sessionStorage.getItem('uuid');
+
+    axios.get(`https://${environment_url}/api/v1/tokens/authn?deviceId=${deviceId}&requestor=${requestor_id}`,
       {
         headers: {
           "Authorization": getAdobeAuthorizationHeader(
@@ -42,9 +45,9 @@ class WelcomeScreen extends React.Component {
       .then(async res => {
         if (res.status === 200) {
           this.setState({
-            mvpd: res.data.mvpd
+            requestor: res.data.requestor
           }, () => {
-            trackEvent(this.props.segmentKey, "Welcome", { accessToken: res.data.mvpd });
+            trackEvent(this.props.segmentKey, "Welcome", { accessToken: res.data.requestor });
           })
         } else {
           this.props.goToScreen('SIGNIN')
@@ -75,7 +78,7 @@ class WelcomeScreen extends React.Component {
       }
     ).then(async response => {
       if (response.status === 204) {
-        trackEvent(this.props.segmentKey, "SignOut", { accessToken: this.state.mvpd }, "Welcome");
+        trackEvent(this.props.segmentKey, "SignOut", { accessToken: this.state.requestor }, "Welcome");
         this.props.goToScreen('LOADING')
       }
     }).catch(err => console.log(err))
@@ -86,11 +89,11 @@ class WelcomeScreen extends React.Component {
       <Layout>
         <View style={styles.container}>
           <Text style={styles.text}>You've signed in with your TV Provider: </Text>
-          <Text style={{ ...styles.text, textAlign: 'center', fontWeight: 'bold' }}>{this.state.mvpd}</Text>
-          <FocusableGroup id={'sign-in-button'} style={styles.buttonContainer} preferredFocus={true}>
+          <Text style={{ ...styles.text, textAlign: 'center', fontWeight: 'bold' }}>{this.state.requestor}</Text>
+          <FocusableGroup id={'welcome-group'} style={styles.buttonContainer} preferredFocus={true}>
             <Button
               label="Sign Out"
-              groupId={'sign-out-button'}
+              groupId={'welcome-group'}
               onPress={() => this.handleSignOut()}
               preferredFocus={true}
             />

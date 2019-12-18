@@ -2,7 +2,6 @@ import * as React from "react";
 import axios from "axios";
 import { ActivityIndicator, Dimensions, View } from "react-native";
 import { getAdobeAuthorizationHeader } from '../utils/index';
-import { getAppData } from "@applicaster/zapp-react-native-bridge/QuickBrick";
 
 const { height } = Dimensions.get('window');
 
@@ -19,7 +18,7 @@ class LoadingScreen extends React.Component {
       secret
     } = this.props.screenData.general
 
-    axios.get(`https://${environment_url}/api/v1/tokens/authn?deviceId=${getAppData().uuid}&requestor=${requestor_id}`,
+    axios.get(`https://${environment_url}/api/v1/tokens/authn?deviceId=${this.props.deviceId}&requestor=${requestor_id}`,
       {
         headers: {
           "Authorization": getAdobeAuthorizationHeader(
@@ -31,7 +30,7 @@ class LoadingScreen extends React.Component {
           )
         }
       })
-      .then(async res => {
+      .then(res => {
         if (res.status === 200) {
           this.props.goToScreen('WELCOME')
         }

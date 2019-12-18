@@ -1,11 +1,9 @@
 import * as React from "react";
 import axios from "axios";
 import { View, Text, ActivityIndicator } from "react-native";
-import { getAppData } from "@applicaster/zapp-react-native-bridge/QuickBrick";
 import { localStorage } from "@applicaster/zapp-react-native-bridge/ZappStorage/LocalStorage";
 import { trackEvent, identifyUser } from "../analytics/segment/index";
 import { getAdobeAuthorizationHeader } from '../utils/index';
-import { uuidv4 } from "../utils";
 import Layout from "../components/Layout"
 import QRCode from "../components/QRCode"
 
@@ -36,7 +34,8 @@ class SignInScreen extends React.Component {
       secret
     } = this.props.screenData.general;
 
-    axios.get(`https://${environment_url}/api/v1/tokens/authn?deviceId=${getAppData().uuid || uuidv4}&requestor=${requestor_id}`,
+    if (this.props.deviceId) {
+      axios.get(`https://${environment_url}/api/v1/tokens/authn?deviceId=${this.props.deviceId}&requestor=${requestor_id}`,
       {
         headers: {
           "Authorization": getAdobeAuthorizationHeader(
@@ -48,17 +47,24 @@ class SignInScreen extends React.Component {
           )
         }
       })
-      .then(async res => {
+      .then(res => {
         identifyUser(this.props.segmentKey, '', res.data.mvpd, this.state.devicePinCode, 'Sign In Page')
-        
-        await localStorage.setItem(
+
+        localStorage.setItem(
           this.props.mvpd,
           res.data.mvpd,
+          this.props.namespace
+        )
+
+        localStorage.setItem(
+          'adobe-user-id',
+          res.data.userId,
           this.props.namespace
         )
         this.props.goToScreen('WELCOME')
       })
       .catch(err => console.log(err))
+    }
   }
 
   getRegistrationCode() {
@@ -70,8 +76,8 @@ class SignInScreen extends React.Component {
     } = this.props.screenData.general;
 
     const params = new URLSearchParams();
-    params.append('deviceId', (getAppData().uuid || uuidv4));
 
+    params.append('deviceId', this.props.deviceId);
     axios.post(`https://${environment_url}/reggie/v1/olychannel/regcode`, params,
       {
         headers: {
