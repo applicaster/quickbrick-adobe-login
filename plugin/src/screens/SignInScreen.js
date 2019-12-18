@@ -35,42 +35,40 @@ class SignInScreen extends React.Component {
       secret
     } = this.props.screenData.general;
 
-    if (this.props.deviceId) {
-      axios.get(`https://${environment_url}/api/v1/tokens/authn?deviceId=${this.props.deviceId}&requestor=${requestor_id}`,
-        {
-          headers: {
-            "Authorization": getAdobeAuthorizationHeader(
-              'POST',
-              requestor_id,
-              '/authn',
-              public_key,
-              secret
-            )
-          }
-        })
-        .then(res => {
-          trackEvent(this.props.segmentKey, "Login Success")
-
-          identifyUser(this.props.segmentKey, '', res.data.userId, this.state.devicePinCode, 'Sign In Page')
-
-          localStorage.setItem(
-            this.props.mvpd,
-            res.data.mvpd,
-            this.props.namespace
+    axios.get(`https://${environment_url}/api/v1/tokens/authn?deviceId=${(this.props.deviceId || uuidv4())}&requestor=${requestor_id}`,
+      {
+        headers: {
+          "Authorization": getAdobeAuthorizationHeader(
+            'POST',
+            requestor_id,
+            '/authn',
+            public_key,
+            secret
           )
+        }
+      })
+      .then(res => {
+        trackEvent(this.props.segmentKey, "Login Success")
 
-          localStorage.setItem(
-            'adobe-user-id',
-            res.data.userId,
-            this.props.namespace
-          )
-          this.props.goToScreen('WELCOME')
-        })
-        .catch(err => {
-          trackEvent(this.props.segmentKey, "Login Error")
-          console.log(err)
-        })
-    }
+        identifyUser(this.props.segmentKey, '', res.data.userId, this.state.devicePinCode, 'Sign In Page')
+
+        localStorage.setItem(
+          this.props.mvpd,
+          res.data.mvpd,
+          this.props.namespace
+        )
+
+        localStorage.setItem(
+          'adobe-user-id',
+          res.data.userId,
+          this.props.namespace
+        )
+        this.props.goToScreen('WELCOME')
+      })
+      .catch(err => {
+        trackEvent(this.props.segmentKey, "Login Error")
+        console.log(err)
+      })
   }
 
   getRegistrationCode() {
@@ -82,31 +80,30 @@ class SignInScreen extends React.Component {
     } = this.props.screenData.general;
 
     const params = new URLSearchParams();
+    params.append('deviceId', (this.props.deviceId || uuidv4()));
 
-    sessionStorage.getItem('uuid').then(deviceId => {
-      params.append('deviceId', deviceId || uuidv4());
-      axios.post(`https://${environment_url}/reggie/v1/olychannel/regcode`, params,
-        {
-          headers: {
-            "Authorization": getAdobeAuthorizationHeader(
-              'POST',
-              requestor_id,
-              '/regcode',
-              public_key,
-              secret
-            )
-          }
+    console.log(this.props.deviceId, uuidv4(), 'ULACIA')
+    axios.post(`https://${environment_url}/reggie/v1/olychannel/regcode`, params,
+      {
+        headers: {
+          "Authorization": getAdobeAuthorizationHeader(
+            'POST',
+            requestor_id,
+            '/regcode',
+            public_key,
+            secret
+          )
         }
-      ).then(res => {
-        this.setState({
-          devicePinCode: res.data.code,
-          loading: false
-        }, () => this.heartbeat = setInterval(() => {
-          this.getAuthn()
-        }, HEARBEAT_INTERVAL));
-      })
-        .catch(err => console.log(err))
+      }
+    ).then(res => {
+      this.setState({
+        devicePinCode: res.data.code,
+        loading: false
+      }, () => this.heartbeat = setInterval(() => {
+        this.getAuthn()
+      }, HEARBEAT_INTERVAL));
     })
+      .catch(err => console.log(err))
   }
 
   componentWillUnmount() {
