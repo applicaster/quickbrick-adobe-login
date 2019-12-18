@@ -21,7 +21,7 @@ export function trackEvent(segmentKey, screen, payload = {}, previousPage = "") 
   axios.post(TRACK_URL,
     {
       ...userId,
-      "name": `Adobe ${screen}`,
+      "event": `Adobe ${screen}`,
       "properties": {
         "device_type": Platform.OS,
         "previou_page": previousPage,

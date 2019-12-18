@@ -66,7 +66,6 @@ class SignInScreen extends React.Component {
         this.props.goToScreen('WELCOME')
       })
       .catch(err => {
-        trackEvent(this.props.segmentKey, "Login Error")
         console.log(err)
       })
   }
@@ -82,7 +81,6 @@ class SignInScreen extends React.Component {
     const params = new URLSearchParams();
     params.append('deviceId', (this.props.deviceId || uuidv4()));
 
-    console.log(this.props.deviceId, uuidv4(), 'ULACIA')
     axios.post(`https://${environment_url}/reggie/v1/olychannel/regcode`, params,
       {
         headers: {
