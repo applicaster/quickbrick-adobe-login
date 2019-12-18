@@ -23,6 +23,7 @@ export function trackEvent(segmentKey, screen, payload = {}, previousPage = "") 
       ...userId,
       "event": `Adobe ${screen}`,
       "properties": {
+        "name": `Adobe ${screen}`,
         "device_type": Platform.OS,
         "previou_page": previousPage,
         "device_id": getAppData().uuid || uuidv4(),
