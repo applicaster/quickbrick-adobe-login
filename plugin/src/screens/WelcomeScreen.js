@@ -14,7 +14,7 @@ class WelcomeScreen extends React.Component {
     super(props);
 
     this.state = {
-      requestor: ''
+      mvpd: ''
     }
 
     this.handleSignOut = this.handleSignOut.bind(this);
@@ -45,9 +45,9 @@ class WelcomeScreen extends React.Component {
       .then(async res => {
         if (res.status === 200) {
           this.setState({
-            requestor: res.data.requestor
+            mvpd: res.data.mvpd
           }, () => {
-            trackEvent(this.props.segmentKey, "Welcome", { accessToken: res.data.requestor });
+            trackEvent(this.props.segmentKey, "Welcome", { accessToken: res.data.mvpd });
           })
         } else {
           this.props.goToScreen('SIGNIN')
@@ -78,7 +78,7 @@ class WelcomeScreen extends React.Component {
       }
     ).then(async response => {
       if (response.status === 204) {
-        trackEvent(this.props.segmentKey, "Signed Out", { accessToken: this.state.requestor }, "Welcome");
+        trackEvent(this.props.segmentKey, "Signed Out", { accessToken: this.state.mvpd }, "Welcome");
         this.props.goToScreen('LOADING')
       }
     }).catch(err => console.log(err))
@@ -89,7 +89,7 @@ class WelcomeScreen extends React.Component {
       <Layout>
         <View style={styles.container}>
           <Text style={styles.text}>You've signed in with your TV Provider: </Text>
-          <Text style={{ ...styles.text, textAlign: 'center', fontWeight: 'bold' }}>{this.state.requestor}</Text>
+          <Text style={{ ...styles.text, textAlign: 'center', fontWeight: 'bold' }}>{this.state.mvpd}</Text>
           <FocusableGroup id={'welcome-group'} style={styles.buttonContainer} preferredFocus={true}>
             <Button
               label="Sign Out"
