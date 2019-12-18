@@ -4,7 +4,7 @@ import { View, Text, ActivityIndicator } from "react-native";
 import { localStorage } from "@applicaster/zapp-react-native-bridge/ZappStorage/LocalStorage";
 import { sessionStorage } from "@applicaster/zapp-react-native-bridge/ZappStorage/SessionStorage";
 import { trackEvent, identifyUser } from "../analytics/segment/index";
-import { getAdobeAuthorizationHeader } from '../utils/index';
+import { getAdobeAuthorizationHeader, uuidv4 } from '../utils/index';
 import Layout from "../components/Layout"
 import QRCode from "../components/QRCode"
 
@@ -84,7 +84,7 @@ class SignInScreen extends React.Component {
     const params = new URLSearchParams();
 
     sessionStorage.getItem('uuid').then(deviceId => {
-      params.append('deviceId', deviceId);
+      params.append('deviceId', deviceId || uuidv4());
       axios.post(`https://${environment_url}/reggie/v1/olychannel/regcode`, params,
         {
           headers: {
