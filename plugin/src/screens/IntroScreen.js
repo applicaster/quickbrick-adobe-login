@@ -7,7 +7,7 @@ import Layout from "../components/Layout";
 
 class IntroScreen extends React.Component {
   componentDidMount() {
-    trackEvent(this.props.segmentKey, "Entry");
+    trackEvent(this.props.segmentKey, "User Register Start");
   }
 
   render() {

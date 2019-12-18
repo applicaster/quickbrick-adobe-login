@@ -58,7 +58,6 @@ class AdobeLoginComponent extends Component {
           screenData={this.props.screenData}
           groupId={groupId()}
           segmentKey={segmentKey}
-          deviceId={this.state.deviceId}
         />;
       }
       case 'INTRO': {
@@ -96,7 +95,7 @@ class AdobeLoginComponent extends Component {
 
   render() {
     return (
-      this.state.deviceId ? this.renderScreen(this.state.screen) : null
+      this.renderScreen(this.state.screen)
     );
   }
 }

@@ -2,6 +2,7 @@ import * as React from "react";
 import axios from "axios";
 import { View, Text, ActivityIndicator } from "react-native";
 import { localStorage } from "@applicaster/zapp-react-native-bridge/ZappStorage/LocalStorage";
+import { sessionStorage } from "@applicaster/zapp-react-native-bridge/ZappStorage/SessionStorage";
 import { trackEvent, identifyUser } from "../analytics/segment/index";
 import { getAdobeAuthorizationHeader } from '../utils/index';
 import Layout from "../components/Layout"
@@ -36,34 +37,39 @@ class SignInScreen extends React.Component {
 
     if (this.props.deviceId) {
       axios.get(`https://${environment_url}/api/v1/tokens/authn?deviceId=${this.props.deviceId}&requestor=${requestor_id}`,
-      {
-        headers: {
-          "Authorization": getAdobeAuthorizationHeader(
-            'POST',
-            requestor_id,
-            '/authn',
-            public_key,
-            secret
+        {
+          headers: {
+            "Authorization": getAdobeAuthorizationHeader(
+              'POST',
+              requestor_id,
+              '/authn',
+              public_key,
+              secret
+            )
+          }
+        })
+        .then(res => {
+          trackEvent(this.props.segmentKey, "Login Success")
+
+          identifyUser(this.props.segmentKey, '', res.data.userId, this.state.devicePinCode, 'Sign In Page')
+
+          localStorage.setItem(
+            this.props.mvpd,
+            res.data.mvpd,
+            this.props.namespace
           )
-        }
-      })
-      .then(res => {
-        identifyUser(this.props.segmentKey, '', res.data.mvpd, this.state.devicePinCode, 'Sign In Page')
 
-        localStorage.setItem(
-          this.props.mvpd,
-          res.data.mvpd,
-          this.props.namespace
-        )
-
-        localStorage.setItem(
-          'adobe-user-id',
-          res.data.userId,
-          this.props.namespace
-        )
-        this.props.goToScreen('WELCOME')
-      })
-      .catch(err => console.log(err))
+          localStorage.setItem(
+            'adobe-user-id',
+            res.data.userId,
+            this.props.namespace
+          )
+          this.props.goToScreen('WELCOME')
+        })
+        .catch(err => {
+          trackEvent(this.props.segmentKey, "Login Error")
+          console.log(err)
+        })
     }
   }
 
@@ -77,28 +83,30 @@ class SignInScreen extends React.Component {
 
     const params = new URLSearchParams();
 
-    params.append('deviceId', this.props.deviceId);
-    axios.post(`https://${environment_url}/reggie/v1/olychannel/regcode`, params,
-      {
-        headers: {
-          "Authorization": getAdobeAuthorizationHeader(
-            'POST',
-            requestor_id,
-            '/regcode',
-            public_key,
-            secret
-          )
+    sessionStorage.getItem('uuid').then(deviceId => {
+      params.append('deviceId', deviceId);
+      axios.post(`https://${environment_url}/reggie/v1/olychannel/regcode`, params,
+        {
+          headers: {
+            "Authorization": getAdobeAuthorizationHeader(
+              'POST',
+              requestor_id,
+              '/regcode',
+              public_key,
+              secret
+            )
+          }
         }
-      }
-    ).then(res => {
-      this.setState({
-        devicePinCode: res.data.code,
-        loading: false
-      }, () => this.heartbeat = setInterval(() => {
-        this.getAuthn()
-      }, HEARBEAT_INTERVAL));
+      ).then(res => {
+        this.setState({
+          devicePinCode: res.data.code,
+          loading: false
+        }, () => this.heartbeat = setInterval(() => {
+          this.getAuthn()
+        }, HEARBEAT_INTERVAL));
+      })
+        .catch(err => console.log(err))
     })
-      .catch(err => console.log(err))
   }
 
   componentWillUnmount() {

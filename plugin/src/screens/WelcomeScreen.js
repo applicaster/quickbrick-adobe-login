@@ -78,7 +78,7 @@ class WelcomeScreen extends React.Component {
       }
     ).then(async response => {
       if (response.status === 204) {
-        trackEvent(this.props.segmentKey, "SignOut", { accessToken: this.state.requestor }, "Welcome");
+        trackEvent(this.props.segmentKey, "Signed Out", { accessToken: this.state.requestor }, "Welcome");
         this.props.goToScreen('LOADING')
       }
     }).catch(err => console.log(err))
