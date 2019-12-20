@@ -54,15 +54,10 @@ class SignInScreen extends React.Component {
 
         localStorage.setItem(
           this.props.mvpd,
-          res.data.mvpd,
+          JSON.stringify(res.data),
           this.props.namespace
         )
 
-        localStorage.setItem(
-          'adobe-user-id',
-          res.data.userId,
-          this.props.namespace
-        )
         this.props.goToScreen('WELCOME')
       })
       .catch(err => {
