@@ -6,7 +6,8 @@ import SignInScreen from './screens/SignInScreen';
 import WelcomeScreen from './screens/WelcomeScreen';
 
 const NAMESPACE = 'adobe-login';
-const MVPD = 'adobe-mvpd'
+const ADOBE_TOKEN = "adobe-token";
+
 
 class AdobeLoginComponent extends Component {
   constructor(props) {
@@ -74,7 +75,7 @@ class AdobeLoginComponent extends Component {
           registrationUrl={this.props.screenData.general.registration_url}
           screenData={this.props.screenData}
           namespace={NAMESPACE}
-          mvpd={MVPD}
+          adobeToken={ADOBE_TOKEN}
           deviceId={this.state.deviceId}
           groupId={groupId()}
           segmentKey={segmentKey}
@@ -85,7 +86,7 @@ class AdobeLoginComponent extends Component {
           goToScreen={this.goToScreen}
           screenData={this.props.screenData}
           namespace={NAMESPACE}
-          mvpd={MVPD}
+          adobeToken={ADOBE_TOKEN}
           groupId={groupId()}
           segmentKey={segmentKey}
         />;

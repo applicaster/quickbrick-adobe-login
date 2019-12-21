@@ -53,7 +53,7 @@ class SignInScreen extends React.Component {
         identifyUser(this.props.segmentKey, '', res.data.userId, this.state.devicePinCode, 'Sign In Page')
 
         localStorage.setItem(
-          this.props.mvpd,
+          this.props.adobeToken,
           JSON.stringify(res.data),
           this.props.namespace
         )
