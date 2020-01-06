@@ -25,10 +25,14 @@ class IntroScreen extends React.Component {
             <FocusableGroup 
               id={'sign-in-button'} 
               style={styles.focusBtnContainer} 
-              preferredFocus={true}
               groupId={this.props.groupId}
             >
-              <Button label="Sign In" groupId={'sign-in-button'} onPress={() => this.props.goToScreen("SIGNIN")} preferredFocus={true}/>
+              <Button 
+                label="Sign In" 
+                groupId={'sign-in-button'} 
+                onPress={() => this.props.goToScreen("SIGNIN")} 
+                preferredFocus={true}
+              />
             </FocusableGroup>
           </View>
         </View>

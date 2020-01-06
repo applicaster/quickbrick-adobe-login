@@ -90,7 +90,11 @@ class WelcomeScreen extends React.Component {
         <View style={styles.container}>
           <Text style={styles.text}>You've signed in with your TV Provider: </Text>
           <Text style={{ ...styles.text, textAlign: 'center', fontWeight: 'bold' }}>{this.state.mvpd}</Text>
-          <FocusableGroup id={'welcome-group'} style={styles.buttonContainer} preferredFocus={true}>
+          <FocusableGroup 
+            id={'welcome-group'} 
+            style={styles.buttonContainer}
+            groupId={this.props.groupId}  
+          >
             <Button
               label="Sign Out"
               groupId={'welcome-group'}
