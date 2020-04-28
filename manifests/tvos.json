@@ -58,6 +58,16 @@
       "type": "text",
       "key": "segment_key",
       "tooltip_text": "Segment Key"
+    },
+    {
+      "type": "text",
+      "key": "intro_message",
+      "tooltip_text": "Intro Message"
+    },
+    {
+      "type": "text",
+      "key": "sign_message",
+      "tooltip_text": "Sign In Message"
     }
   ],
   "targets": ["tv"]

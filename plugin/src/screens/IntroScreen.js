@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react'
-import { View, Text, Platform} from "react-native";
+import { View, Text, Platform } from "react-native";
 import { useInitialFocus } from "@applicaster/zapp-react-native-utils/focusManager";
 import { trackEvent } from "../analytics/segment/index";
 import Button from "../components/Button";
@@ -11,7 +11,8 @@ const IntroScreen = (props) => {
     segmentKey,
     goToScreen,
     parentFocus,
-    groupId
+    groupId,
+    screenData
   } = props;
 
   const signInButton = useRef(null);
@@ -28,12 +29,8 @@ const IntroScreen = (props) => {
     <Layout>
       <View style={styles.container}>
         <Text style={styles.subTitle}>
-          Sign in with your TV Provider
-      </Text>
-        <Text style={styles.subTitle}>
-          to watch live Olympic Channel events
-      </Text>
-        <Text style={styles.subTitle}>(US Only)</Text>
+          {screenData.general.intro_message}
+        </Text>
         <View style={styles.buttonContainer}>
           <Button
             label="Sign In"
@@ -43,7 +40,7 @@ const IntroScreen = (props) => {
             buttonRef={signInButton}
             onPress={() => goToScreen("SIGNIN")}
             nextFocusLeft={parentFocus ? parentFocus.nextFocusLeft : null}
-            />
+          />
         </View>
       </View>
     </Layout>

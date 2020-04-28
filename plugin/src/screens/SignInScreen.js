@@ -124,16 +124,10 @@ const SignInScreen = props => {
     <Layout isPrehook={isPrehook}>
       <View style={styles.container}>
         <Text style={styles.title}>
-          Enjoy the Olympic Channel content by activating your device with your pay TV account
+          {screenData.general.sign_message}
         </Text>
         <View style={styles.columnsContainer}>
           <View style={styles.leftColumn}>
-            <Text style={styles.text} adjustsFontSizeToFit>
-              Go to:
-          </Text>
-            <Text style={{ ...styles.text, ...styles.url }} adjustsFontSizeToFit>
-              activate.olympicchannel.com
-          </Text>
             <Text style={{ ...styles.text, marginBottom: 30 }} adjustsFontSizeToFit>
               Enter the activation code below
           </Text>
