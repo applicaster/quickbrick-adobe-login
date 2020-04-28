@@ -1,34 +1,48 @@
-import * as React from "react";
+import React, { useState, useEffect, useRef } from 'react';
 import axios from "axios";
-import { View, Text } from "react-native";
-import { getAppData } from "@applicaster/zapp-react-native-bridge/QuickBrick";
-import { FocusableGroup } from "@applicaster/zapp-react-native-ui-components/Components/FocusableGroup";
+import { View, Text, Platform } from "react-native";
+import { useInitialFocus } from "@applicaster/zapp-react-native-utils/focusManager";
 import { sessionStorage } from "@applicaster/zapp-react-native-bridge/ZappStorage/SessionStorage";
 import { getAdobeAuthorizationHeader } from '../utils/index';
 import { trackEvent } from "../analytics/segment/index";
 import Button from "../components/Button";
 import Layout from "../components/Layout";
 
-class WelcomeScreen extends React.Component {
-  constructor(props) {
-    super(props);
+const WelcomeScreen = props => {
+  const {
+    segmentKey,
+    groupId,
+    parentFocus,
+    screenData,
+    deviceId,
+    goToScreen
+  } = props;
 
-    this.state = {
-      mvpd: ''
+  let logoutButton = useRef(null);
+
+  const [mvpd, setMvpd] = useState('');
+
+  useEffect(() => {
+    if (deviceId) {
+      checkDeviceStatus(deviceId);
     }
+  }, [])
 
-    this.handleSignOut = this.handleSignOut.bind(this);
-  }
+  useEffect(() => {
+    trackEvent(segmentKey, "Welcome", { accessToken: mvpd });
+  }, [mvpd]);
 
-  componentDidMount() {
+  useEffect(() => {
+    checkDeviceStatus(deviceId)
+  }, [deviceId]);
+
+  const checkDeviceStatus = () => {
     const {
       environment_url,
       requestor_id,
       public_key,
       secret
-    } = this.props.screenData.general
-
-    const deviceId = sessionStorage.getItem('uuid');
+    } = screenData.general
 
     axios.get(`https://${environment_url}/api/v1/tokens/authn?deviceId=${deviceId}&requestor=${requestor_id}`,
       {
@@ -44,69 +58,66 @@ class WelcomeScreen extends React.Component {
       })
       .then(async res => {
         if (res.status === 200) {
-          this.setState({
-            mvpd: res.data.mvpd
-          }, () => {
-            trackEvent(this.props.segmentKey, "Welcome", { accessToken: res.data.mvpd });
-          })
+          setMvpd(res.data.mvpd)
         } else {
-          this.props.goToScreen('SIGNIN')
+          goToScreen('SIGNIN')
         }
       })
       .catch(err => console.log(err))
   }
 
-  handleSignOut() {
+  const handleSignOut = () => {
     const {
       environment_url,
       requestor_id,
       public_key,
       secret
-    } = this.props.screenData.general
+    } = screenData.general;
 
-    axios.delete(`https://${environment_url}/api/v1/logout?deviceId=${getAppData().uuid}`,
-      {
-        headers: {
-          "Authorization": getAdobeAuthorizationHeader(
-            'GET',
-            requestor_id,
-            '/logout',
-            public_key,
-            secret
-          )
+    sessionStorage.getItem('uuid').then(deviceId => {
+      axios.delete(`https://${environment_url}/api/v1/logout?deviceId=${deviceId}`,
+        {
+          headers: {
+            "Authorization": getAdobeAuthorizationHeader(
+              'GET',
+              requestor_id,
+              '/logout',
+              public_key,
+              secret
+            )
+          }
         }
-      }
-    ).then(async response => {
-      if (response.status === 204) {
-        trackEvent(this.props.segmentKey, "Signed Out", { accessToken: this.state.mvpd }, "Welcome");
-        this.props.goToScreen('LOADING')
-      }
-    }).catch(err => console.log(err))
+      ).then(async response => {
+        if (response.status === 204) {
+          trackEvent(segmentKey, "Signed Out", { accessToken: mvpd }, "Welcome");
+          goToScreen('LOADING')
+        }
+      }).catch(err => console.log(err))
+    });
   }
 
-  render() {
-    return (
-      <Layout>
-        <View style={styles.container}>
-          <Text style={styles.text}>You've signed in with your TV Provider: </Text>
-          <Text style={{ ...styles.text, textAlign: 'center', fontWeight: 'bold' }}>{this.state.mvpd}</Text>
-          <FocusableGroup 
-            id={'welcome-group'} 
-            style={styles.buttonContainer}
-            groupId={this.props.groupId}  
-          >
-            <Button
-              label="Sign Out"
-              groupId={'welcome-group'}
-              onPress={() => this.handleSignOut()}
-              preferredFocus={true}
-            />
-          </FocusableGroup>
-        </View>
-      </Layout>
-    );
+  if (Platform.OS === 'android') {
+    useInitialFocus(true, logoutButton);
   }
-}
+
+  return (
+    <Layout>
+      <View style={styles.container}>
+        <Text style={styles.text}>You've signed in with your TV Provider </Text>
+        <Text style={{ ...styles.text, textAlign: 'center', fontWeight: 'bold' }}>{mvpd}</Text>
+        <Button
+          label={'Sign Out'}
+          preferredFocus={true}
+          groupId={groupId}
+          id="welcome-group"
+          buttonRef={logoutButton}
+          onPress={() => handleSignOut()}
+          nextFocusLeft={parentFocus ? parentFocus.nextFocusLeft : null}
+        />
+      </View>
+    </Layout>
+  );
+};
 
 const styles = {
   container: {

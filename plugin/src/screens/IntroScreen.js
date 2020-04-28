@@ -1,44 +1,53 @@
-import * as React from "react";
-import { View, Text } from "react-native";
-import { FocusableGroup } from "@applicaster/zapp-react-native-ui-components/Components/FocusableGroup";
+import React, { useEffect, useRef } from 'react'
+import { View, Text, Platform} from "react-native";
+import { useInitialFocus } from "@applicaster/zapp-react-native-utils/focusManager";
 import { trackEvent } from "../analytics/segment/index";
 import Button from "../components/Button";
 import Layout from "../components/Layout";
 
-class IntroScreen extends React.Component {
-  componentDidMount() {
-    trackEvent(this.props.segmentKey, "User Register Start");
+const IntroScreen = (props) => {
+  const {
+    focused,
+    segmentKey,
+    goToScreen,
+    parentFocus,
+    groupId
+  } = props;
+
+  const signInButton = useRef(null);
+
+  useEffect(() => {
+    trackEvent(segmentKey, "User Register Start");
+  }, [])
+
+  if (Platform.OS === 'android') {
+    useInitialFocus(focused, signInButton);
   }
 
-  render() {
-    return (
-      <Layout>
-        <View style={styles.container}>
-          <Text style={styles.subTitle}>
-            Sign in with your TV Provider
-          </Text>
-          <Text style={styles.subTitle}>
-            to watch live Olympic Channel events
-          </Text>
-          <Text style={styles.subTitle}>(US Only)</Text>
-          <View style={styles.buttonContainer}>
-            <FocusableGroup 
-              id={'sign-in-button'} 
-              style={styles.focusBtnContainer} 
-              groupId={this.props.groupId}
-            >
-              <Button 
-                label="Sign In" 
-                groupId={'sign-in-button'} 
-                onPress={() => this.props.goToScreen("SIGNIN")} 
-                preferredFocus={true}
-              />
-            </FocusableGroup>
-          </View>
+  return (
+    <Layout>
+      <View style={styles.container}>
+        <Text style={styles.subTitle}>
+          Sign in with your TV Provider
+      </Text>
+        <Text style={styles.subTitle}>
+          to watch live Olympic Channel events
+      </Text>
+        <Text style={styles.subTitle}>(US Only)</Text>
+        <View style={styles.buttonContainer}>
+          <Button
+            label="Sign In"
+            preferredFocus={true}
+            groupId={groupId}
+            id="sign-in-button"
+            buttonRef={signInButton}
+            onPress={() => goToScreen("SIGNIN")}
+            nextFocusLeft={parentFocus ? parentFocus.nextFocusLeft : null}
+            />
         </View>
-      </Layout>
-    );
-  }
+      </View>
+    </Layout>
+  );
 }
 
 const styles = {
@@ -59,10 +68,10 @@ const styles = {
     justifyContent: 'center'
   },
   focusBtnContainer: {
-    justifyContent: 'center', 
+    justifyContent: 'center',
     alignItems: 'center'
   }
 };
 
 IntroScreen.displayName = 'IntroScreen';
-export default IntroScreen;
+export default IntroScreen

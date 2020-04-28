@@ -1,19 +1,57 @@
 import * as React from "react";
-import { View, Text } from "react-native";
+import { FocusableGroup } from "@applicaster/zapp-react-native-ui-components/Components/FocusableGroup";
 import { Focusable } from "@applicaster/zapp-react-native-ui-components/Components/Focusable";
+import { View, Text, Platform } from "react-native";
 
-export default function Button({ label, groupId, onPress, preferredFocus}) {
+export default function Button(props) {
+  const {
+    id,
+    label,
+    groupId,
+    onPress,
+    preferredFocus,
+    buttonRef,
+    nextFocusLeft,
+    style
+  } = props;
+
+  const renderButton = (focused, label) => {
+    const buttonStyles = styles[focused ? "focused" : "default"];
+    return (
+      <View style={buttonStyles.button}>
+        <Text style={buttonStyles.buttonText}>{label}</Text>
+      </View>
+    )
+  };
+
   return (
-    <Focusable id={`oc-login-${label}`} groupId={groupId} onPress={onPress} preferredFocus={preferredFocus}>
-      {focused => {
-        const buttonStyles = styles[focused ? "focused" : "default"];
-        return (
-          <View style={buttonStyles.button}>
-            <Text style={buttonStyles.buttonText}>{label}</Text>
-          </View>
-        );
-      }}
-    </Focusable>
+    Platform.OS !== 'android'
+      ? <FocusableGroup
+        id={id}
+        style={styles.buttonContainer}
+        groupId={groupId}
+        style={style}
+      >
+        <Focusable
+          id={`oc-adobe-${label}`}
+          groupId={groupId}
+          onPress={onPress}
+          preferredFocus={preferredFocus}
+        >
+          {focused => renderButton(focused, label)}
+        </Focusable>
+      </FocusableGroup>
+      : <View style={style}>
+        <Focusable
+          ref={buttonRef}
+          id={id}
+          onPress={onPress}
+          nextFocusLeft={nextFocusLeft}
+
+        >
+          {focused => renderButton(focused, label)}
+        </Focusable>
+      </View>
   );
 }
 

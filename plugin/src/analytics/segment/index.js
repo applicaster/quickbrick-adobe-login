@@ -1,12 +1,14 @@
 import axios from "axios";
 import { Platform } from "react-native";
-import { getAppData } from "@applicaster/zapp-react-native-bridge/QuickBrick";
+import { sessionStorage } from "@applicaster/zapp-react-native-bridge/ZappStorage/SessionStorage";
 import { uuidv4 } from "../../utils";
 
 const TRACK_URL = "https://api.segment.io/v1/track"
 const IDENTIFY_URL = "https://api.segment.io/v1/identify"
 
-export function trackEvent(segmentKey, screen, payload = {}, previousPage = "") {
+export async function trackEvent(segmentKey, screen, payload = {}, previousPage = "") {
+
+  const deviceId = await sessionStorage.getItem('uuid');
   
   if (payload.accessToken) {
     userId = {
@@ -21,12 +23,13 @@ export function trackEvent(segmentKey, screen, payload = {}, previousPage = "") 
   axios.post(TRACK_URL,
     {
       ...userId,
-      "event": `Adobe ${screen}`,
+      "event": `${screen}`,
       "properties": {
-        "name": `Adobe ${screen}`,
+        'provider': 'Adobe',
+        "name": `${screen}`,
         "device_type": Platform.OS,
         "previou_page": previousPage,
-        "device_id": getAppData().uuid || uuidv4(),
+        "device_id": deviceId || uuidv4(),
         payload
       },
       "timestamp": Date.now()

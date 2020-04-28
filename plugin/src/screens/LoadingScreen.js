@@ -2,7 +2,6 @@ import * as React from "react";
 import axios from "axios";
 import { ActivityIndicator, Dimensions, View } from "react-native";
 import { getAdobeAuthorizationHeader, uuidv4 } from '../utils/index';
-import { sessionStorage } from "@applicaster/zapp-react-native-bridge/ZappStorage/SessionStorage";
 
 const { height } = Dimensions.get('window');
 
@@ -13,18 +12,31 @@ class LoadingScreen extends React.Component {
     this.state = {
       deviceId: ''
     }
+
+    this.checkDeviceStatus = this.checkDeviceStatus.bind(this);
   }
 
   componentDidMount() {
+    if (this.props.deviceId) {
+      this.checkDeviceStatus(this.props.deviceId);
+    }
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.deviceId !== this.props.deviceId) {
+      this.checkDeviceStatus(nextProps.deviceId)
+    }
+  }
+
+  checkDeviceStatus(deviceId) {
     const {
       environment_url,
       requestor_id,
       public_key,
       secret
-    } = this.props.screenData.general
+    } = this.props.screenData.general;
 
-    sessionStorage.getItem('uuid').then(deviceId => {
-      axios.get(`https://${environment_url}/api/v1/tokens/authn?deviceId=${deviceId || uuidv4()}&requestor=${requestor_id}`,
+    axios.get(`https://${environment_url}/api/v1/tokens/authn?deviceId=${deviceId || uuidv4()}&requestor=${requestor_id}`,
       {
         headers: {
           "Authorization": getAdobeAuthorizationHeader(
@@ -41,13 +53,10 @@ class LoadingScreen extends React.Component {
           this.props.goToScreen('WELCOME')
         }
       })
-      .catch(err => { 
+      .catch(err => {
         console.log(err);
         this.props.goToScreen('INTRO')
-      })
-    })
-
-
+      });
   }
 
   render() {
