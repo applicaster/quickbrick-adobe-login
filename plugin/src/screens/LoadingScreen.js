@@ -34,7 +34,7 @@ class LoadingScreen extends React.Component {
       requestor_id,
       public_key,
       secret
-    } = this.props.screenData.general;
+    } = this.props.configuration;
 
     axios.get(`https://${environment_url}/api/v1/tokens/authn?deviceId=${deviceId || uuidv4()}&requestor=${requestor_id}`,
       {

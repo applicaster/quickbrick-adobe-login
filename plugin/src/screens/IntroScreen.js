@@ -12,7 +12,7 @@ const IntroScreen = (props) => {
     goToScreen,
     parentFocus,
     groupId,
-    screenData
+    configuration
   } = props;
 
   const signInButton = useRef(null);
@@ -29,7 +29,7 @@ const IntroScreen = (props) => {
     <Layout>
       <View style={styles.container}>
         <Text style={styles.subTitle}>
-          {screenData.general.intro_message}
+          {configuration.intro_message}
         </Text>
         <View style={styles.buttonContainer}>
           <Button

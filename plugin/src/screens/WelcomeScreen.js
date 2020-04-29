@@ -13,7 +13,7 @@ const WelcomeScreen = props => {
     segmentKey,
     groupId,
     parentFocus,
-    screenData,
+    configuration,
     deviceId,
     goToScreen
   } = props;
@@ -42,7 +42,7 @@ const WelcomeScreen = props => {
       requestor_id,
       public_key,
       secret
-    } = screenData.general
+    } = configuration
 
     axios.get(`https://${environment_url}/api/v1/tokens/authn?deviceId=${deviceId}&requestor=${requestor_id}`,
       {
@@ -72,7 +72,7 @@ const WelcomeScreen = props => {
       requestor_id,
       public_key,
       secret
-    } = screenData.general;
+    } = configuration;
 
     sessionStorage.getItem('uuid').then(deviceId => {
       axios.delete(`https://${environment_url}/api/v1/logout?deviceId=${deviceId}`,

@@ -42,69 +42,47 @@ class AdobeLoginComponent extends Component {
   renderScreen(screen) {
     const {
       screenData,
-      payload,
       configuration,
       parentFocus,
       focused
     } = this.props
 
-    const groupId = () => {
-      if (screenData) {
-        return screenData.groupId;
-      }
-      if (payload) {
-        return payload.groupId
-      }
-      return '';
-    }
+    const groupId = screenData.groupId || '';
+    const segmentKey = configuration.segment_key;
 
-    const segmentKey = screenData
-      ? screenData.general.segment_key
-      : configuration.segment_key;
+    const screenConfig = {
+      goToScreen: this.goToScreen,
+      deviceId: this.state.deviceId,
+      configuration,
+      segmentKey,
+      groupId,
+    }
 
     switch (screen) {
       case 'LOADING': {
-        return <LoadingScreen
-          goToScreen={this.goToScreen}
-          screenData={screenData}
-          groupId={groupId()}
-          segmentKey={segmentKey}
-          deviceId={this.state.deviceId}
-        />;
+        return <LoadingScreen {...screenConfig} />;
       }
       case 'INTRO': {
         return <IntroScreen
-          goToScreen={this.goToScreen}
-          screenData={screenData}
-          groupId={groupId()}
-          segmentKey={segmentKey}
+          {...screenConfig}
           parentFocus={parentFocus}
           focused={focused}
         />;
       }
       case 'SIGNIN': {
         return <SignInScreen
-          goToScreen={this.goToScreen}
-          registrationUrl={screenData.general.registration_url}
-          screenData={screenData}
+          {...screenConfig}
           namespace={NAMESPACE}
           adobeToken={ADOBE_TOKEN}
-          deviceId={this.state.deviceId}
-          groupId={groupId()}
-          segmentKey={segmentKey}
           parentFocus={parentFocus}
           focused={focused}
         />
       }
       case 'WELCOME': {
         return <WelcomeScreen
-          goToScreen={this.goToScreen}
-          screenData={screenData}
+          {...screenConfig}
           namespace={NAMESPACE}
           adobeToken={ADOBE_TOKEN}
-          deviceId={this.state.deviceId}
-          groupId={groupId()}
-          segmentKey={segmentKey}
           parentFocus={parentFocus}
           focused={focused}
         />;

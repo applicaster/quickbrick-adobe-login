@@ -14,14 +14,13 @@ const HEARBEAT_INTERVAL = 5000;
 const SignInScreen = props => {
   const {
     segmentKey,
-    screenData,
+    configuration,
     deviceId,
     isPrehook,
     adobeToken,
     namespace,
     goToScreen,
     groupId,
-    registrationUrl,
     parentFocus,
   } = props;
 
@@ -53,7 +52,7 @@ const SignInScreen = props => {
       public_key,
       requestor_id,
       secret
-    } = screenData.general;
+    } = configuration;
 
     const params = new URLSearchParams();
     params.append('deviceId', (deviceId || uuidv4()));
@@ -83,7 +82,7 @@ const SignInScreen = props => {
       requestor_id,
       public_key,
       secret
-    } = screenData.general;
+    } = configuration;
 
     axios.get(`https://${environment_url}/api/v1/tokens/authn?deviceId=${(deviceId || uuidv4())}&requestor=${requestor_id}`,
       {
@@ -124,10 +123,16 @@ const SignInScreen = props => {
     <Layout isPrehook={isPrehook}>
       <View style={styles.container}>
         <Text style={styles.title}>
-          {screenData.general.sign_message}
+          {configuration.sign_message}
         </Text>
         <View style={styles.columnsContainer}>
           <View style={styles.leftColumn}>
+            <Text style={styles.text} adjustsFontSizeToFit>
+              Go to:
+            </Text>
+            <Text style={{ ...styles.text, ...styles.url }} adjustsFontSizeToFit>
+              {configuration.registration_url}
+            </Text>
             <Text style={{ ...styles.text, marginBottom: 30 }} adjustsFontSizeToFit>
               Enter the activation code below
           </Text>
@@ -155,7 +160,7 @@ const SignInScreen = props => {
                 ? <View style={styles.loadContainer}>
                   <ActivityIndicator size="large" color="#525A5C" />
                 </View>
-                : <QRCode url={registrationUrl} />
+                : <QRCode url={configuration.registration_url} />
             }
           </View>
         </View>
