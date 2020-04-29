@@ -10,22 +10,29 @@
   ],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "reset_dev_app": "rm -rf development-app/* development-app/.babelrc",
     "zapplicaster": "node_modules/.bin/zapplicaster-cli prepare --yarn --destination-path development-app",
     "zapplicaster:prepare": "node_modules/.bin/zapplicaster-cli prepare -y -d development-app",
     "zapplicaster:reload": "node_modules/.bin/zapplicaster-cli reload_config -d development-app",
     "clean:node": "rm -rf node_modules **/node_modules yarn.lock && yarn",
     "start": "./node_modules/.bin/react-native start --projectRoot ./development-app",
-    "npm:publish": "yarn workspace @applicaster/quick-brick-oc-account-plugin publish"
+    "start:web": "yarn workspace quick-brick-app start",
+    "npm:publish": "yarn workspace @applicaster/quick-brick-oc-vod-auth-hook publish --no-git-tag-version"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@applicaster/zapplicaster-cli": "2.1.0-rc.be9eefc6"
+    "@applicaster/zapplicaster-cli": "3.0.1-rc.0"
   },
   "dependencies": {
     "react": "16.8.3",
     "react-native": "0.59.10",
-    "react-native-web": "0.11.5"
+    "react-native-web": "0.11.5",
+    "ramda": "^0.25.0",
+    "react-addons-test-utils": "^15.6.2",
+    "react-dom": "^16.4.0",
+    "react-router-enzyme-context": "^1.2.0",
+    "react-test-renderer": "16.8.6"
   }
 }

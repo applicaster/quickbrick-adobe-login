@@ -7,6 +7,7 @@ const TRACK_URL = "https://api.segment.io/v1/track"
 const IDENTIFY_URL = "https://api.segment.io/v1/identify"
 
 export async function trackEvent(segmentKey, screen, payload = {}, previousPage = "") {
+  let userId = {};
 
   const deviceId = await sessionStorage.getItem('uuid');
   

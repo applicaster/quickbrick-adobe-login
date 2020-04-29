@@ -33,13 +33,13 @@ const SignInScreen = props => {
   useEffect(() => {
     trackEvent(segmentKey, "Waiting Page")
     getRegistrationCode()
-  }, [])
-
+  }, []);
 
   useEffect(() => {
     heartbeat = setInterval(() => {
       getAuthn()
     }, HEARBEAT_INTERVAL);
+    return () => clearInterval(heartbeat);
   }, [devicePinCode])
 
   if (Platform.OS === 'android') {
@@ -98,7 +98,6 @@ const SignInScreen = props => {
       })
       .then(res => {
         trackEvent(segmentKey, "Login Success")
-
         identifyUser(segmentKey, '', res.data.userId, devicePinCode, 'Sign In Page')
 
         localStorage.setItem(
