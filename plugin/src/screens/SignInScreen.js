@@ -10,18 +10,22 @@ import QRCode from "../components/QRCode"
 import Button from "../components/Button";
 
 const HEARBEAT_INTERVAL = 5000;
+let forceFocus = true;
 
 const SignInScreen = props => {
   const {
     segmentKey,
     configuration,
+    screenData,
     deviceId,
     isPrehook,
     adobeToken,
     namespace,
     goToScreen,
     groupId,
+    registrationUrl,
     parentFocus,
+    focused
   } = props;
 
   let heartbeat;
@@ -33,7 +37,7 @@ const SignInScreen = props => {
   useEffect(() => {
     trackEvent(segmentKey, "Waiting Page")
     getRegistrationCode()
-  }, []);
+  }, [])
 
   useEffect(() => {
     heartbeat = setInterval(() => {
@@ -43,7 +47,8 @@ const SignInScreen = props => {
   }, [devicePinCode])
 
   if (Platform.OS === 'android') {
-    useInitialFocus(true, refreshButton);
+    useInitialFocus(forceFocus || focused, refreshButton);
+    forceFocus = false;
   }
 
   const getRegistrationCode = () => {
@@ -52,10 +57,10 @@ const SignInScreen = props => {
       public_key,
       requestor_id,
       secret
-    } = configuration;
+    } = screenData.general;
 
     const params = new URLSearchParams();
-    params.append('deviceId', (deviceId || uuidv4()));
+    params.append('deviceId', deviceId);
 
     axios.post(`https://${environment_url}/reggie/v1/olychannel/regcode`, params,
       {
@@ -82,7 +87,7 @@ const SignInScreen = props => {
       requestor_id,
       public_key,
       secret
-    } = configuration;
+    } = screenData.general;
 
     axios.get(`https://${environment_url}/api/v1/tokens/authn?deviceId=${(deviceId || uuidv4())}&requestor=${requestor_id}`,
       {
@@ -98,6 +103,7 @@ const SignInScreen = props => {
       })
       .then(res => {
         trackEvent(segmentKey, "Login Success")
+
         identifyUser(segmentKey, '', res.data.userId, devicePinCode, 'Sign In Page')
 
         localStorage.setItem(
@@ -128,7 +134,7 @@ const SignInScreen = props => {
           <View style={styles.leftColumn}>
             <Text style={styles.text} adjustsFontSizeToFit>
               Go to:
-            </Text>
+          </Text>
             <Text style={{ ...styles.text, ...styles.url }} adjustsFontSizeToFit>
               {configuration.registration_url}
             </Text>
@@ -150,6 +156,7 @@ const SignInScreen = props => {
               buttonRef={refreshButton}
               onPress={refreshPinCode}
               nextFocusLeft={parentFocus ? parentFocus.nextFocusLeft : null}
+              nextFocusUp={parentFocus ? parentFocus.nextFocusUp : null}
               style={styles.focusBtnContainer}
             />
           </View>
@@ -159,7 +166,7 @@ const SignInScreen = props => {
                 ? <View style={styles.loadContainer}>
                   <ActivityIndicator size="large" color="#525A5C" />
                 </View>
-                : <QRCode url={configuration.registration_url} />
+                : <QRCode url={registrationUrl} />
             }
           </View>
         </View>

@@ -12,6 +12,7 @@ export default function Button(props) {
     preferredFocus,
     buttonRef,
     nextFocusLeft,
+    nextFocusUp,
     style
   } = props;
 
@@ -47,7 +48,7 @@ export default function Button(props) {
           id={id}
           onPress={onPress}
           nextFocusLeft={nextFocusLeft}
-
+          nextFocusUp={nextFocusUp}
         >
           {focused => renderButton(focused, label)}
         </Focusable>

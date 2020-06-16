@@ -2,6 +2,7 @@ import * as React from "react";
 import axios from "axios";
 import { ActivityIndicator, Dimensions, View } from "react-native";
 import { getAdobeAuthorizationHeader, uuidv4 } from '../utils/index';
+import { localStorage } from "@applicaster/zapp-react-native-bridge/ZappStorage/LocalStorage";
 
 const { height } = Dimensions.get('window');
 
@@ -10,13 +11,24 @@ class LoadingScreen extends React.Component {
     super(props);
 
     this.state = {
-      deviceId: ''
+      deviceId: '',
+      adobeToken: ''
     }
 
     this.checkDeviceStatus = this.checkDeviceStatus.bind(this);
+    this.handleSignOut = this.handleSignOut.bind(this);
   }
 
-  componentDidMount() {
+  async componentDidMount() {
+    const adobeToken = await localStorage.getItem(
+      this.props.adobeToken,
+      this.props.namespace
+    );
+    
+    this.setState({
+      adobeToken: adobeToken !== 'undefined' ? adobeToken : null
+    });
+    
     if (this.props.deviceId) {
       this.checkDeviceStatus(this.props.deviceId);
     }
@@ -28,13 +40,40 @@ class LoadingScreen extends React.Component {
     }
   }
 
+  handleSignOut() {
+    const {
+      environment_url,
+      requestor_id,
+      public_key,
+      secret
+    } = this.props.screenData.general;
+
+    axios.delete(`https://${environment_url}/api/v1/logout?deviceId=${this.props.deviceId}`,
+      {
+        headers: {
+          "Authorization": getAdobeAuthorizationHeader(
+            'GET',
+            requestor_id,
+            '/logout',
+            public_key,
+            secret
+          )
+        }
+      }
+    ).then(response => {
+      if (response.status === 204) {
+        this.props.goToScreen('INTRO')
+      }
+    }).catch(err => console.log(err))
+  }
+
   checkDeviceStatus(deviceId) {
     const {
       environment_url,
       requestor_id,
       public_key,
       secret
-    } = this.props.configuration;
+    } = this.props.screenData.general;
 
     axios.get(`https://${environment_url}/api/v1/tokens/authn?deviceId=${deviceId || uuidv4()}&requestor=${requestor_id}`,
       {
@@ -50,7 +89,11 @@ class LoadingScreen extends React.Component {
       })
       .then(res => {
         if (res.status === 200) {
-          this.props.goToScreen('WELCOME')
+          if (this.state.adobeToken) {
+            this.props.goToScreen('WELCOME')
+          } else {
+            this.handleSignOut();
+          }
         }
       })
       .catch(err => {

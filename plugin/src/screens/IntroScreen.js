@@ -5,6 +5,8 @@ import { trackEvent } from "../analytics/segment/index";
 import Button from "../components/Button";
 import Layout from "../components/Layout";
 
+let forceFocus = true;
+
 const IntroScreen = (props) => {
   const {
     focused,
@@ -13,7 +15,7 @@ const IntroScreen = (props) => {
     parentFocus,
     groupId,
     configuration
-  } = props;
+    } = props;
 
   const signInButton = useRef(null);
 
@@ -22,7 +24,8 @@ const IntroScreen = (props) => {
   }, [])
 
   if (Platform.OS === 'android') {
-    useInitialFocus(focused, signInButton);
+    useInitialFocus(forceFocus || focused, signInButton);
+    forceFocus = false;
   }
 
   return (
@@ -40,6 +43,7 @@ const IntroScreen = (props) => {
             buttonRef={signInButton}
             onPress={() => goToScreen("SIGNIN")}
             nextFocusLeft={parentFocus ? parentFocus.nextFocusLeft : null}
+            nextFocusUp={parentFocus ? parentFocus.nextFocusUp : null}
           />
         </View>
       </View>

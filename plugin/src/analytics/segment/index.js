@@ -1,23 +1,22 @@
 import axios from "axios";
 import { Platform } from "react-native";
-import { sessionStorage } from "@applicaster/zapp-react-native-bridge/ZappStorage/SessionStorage";
-import { uuidv4 } from "../../utils";
+import { localStorage } from "@applicaster/zapp-react-native-bridge/ZappStorage/LocalStorage";
 
 const TRACK_URL = "https://api.segment.io/v1/track"
 const IDENTIFY_URL = "https://api.segment.io/v1/identify"
+const NAMESPACE = 'adobe-login';
 
 export async function trackEvent(segmentKey, screen, payload = {}, previousPage = "") {
   let userId = {};
+  let deviceId = await localStorage.getItem('uuid', NAMESPACE);
 
-  const deviceId = await sessionStorage.getItem('uuid');
-  
   if (payload.accessToken) {
     userId = {
       "userId": payload.accessToken,
     }
   } else {
     userId = {
-      "anonymousId": uuidv4(),
+      "anonymousId": deviceId,
     }
   }
 
@@ -29,8 +28,8 @@ export async function trackEvent(segmentKey, screen, payload = {}, previousPage 
         'provider': 'Adobe',
         "name": `${screen}`,
         "device_type": Platform.OS,
-        "previou_page": previousPage,
-        "device_id": deviceId || uuidv4(),
+        "previous_page": previousPage,
+        "device_id": deviceId,
         payload
       },
       "timestamp": Date.now()

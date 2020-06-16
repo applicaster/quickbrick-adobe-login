@@ -2,24 +2,28 @@ import React, { useState, useEffect, useRef } from 'react';
 import axios from "axios";
 import { View, Text, Platform } from "react-native";
 import { useInitialFocus } from "@applicaster/zapp-react-native-utils/focusManager";
-import { sessionStorage } from "@applicaster/zapp-react-native-bridge/ZappStorage/SessionStorage";
+import { localStorage } from "@applicaster/zapp-react-native-bridge/ZappStorage/LocalStorage";
 import { getAdobeAuthorizationHeader } from '../utils/index';
 import { trackEvent } from "../analytics/segment/index";
 import Button from "../components/Button";
 import Layout from "../components/Layout";
+
+let forceFocus = true;
 
 const WelcomeScreen = props => {
   const {
     segmentKey,
     groupId,
     parentFocus,
-    configuration,
+    screenData,
     deviceId,
-    goToScreen
+    goToScreen,
+    focused,
+    adobeToken,
+    namespace
   } = props;
 
   let logoutButton = useRef(null);
-
   const [mvpd, setMvpd] = useState('');
 
   useEffect(() => {
@@ -42,7 +46,7 @@ const WelcomeScreen = props => {
       requestor_id,
       public_key,
       secret
-    } = configuration
+    } = screenData.general
 
     axios.get(`https://${environment_url}/api/v1/tokens/authn?deviceId=${deviceId}&requestor=${requestor_id}`,
       {
@@ -72,46 +76,50 @@ const WelcomeScreen = props => {
       requestor_id,
       public_key,
       secret
-    } = configuration;
+    } = screenData.general;
 
-    sessionStorage.getItem('uuid').then(deviceId => {
-      axios.delete(`https://${environment_url}/api/v1/logout?deviceId=${deviceId}`,
-        {
-          headers: {
-            "Authorization": getAdobeAuthorizationHeader(
-              'GET',
-              requestor_id,
-              '/logout',
-              public_key,
-              secret
-            )
-          }
+    axios.delete(`https://${environment_url}/api/v1/logout?deviceId=${deviceId}`,
+      {
+        headers: {
+          "Authorization": getAdobeAuthorizationHeader(
+            'GET',
+            requestor_id,
+            '/logout',
+            public_key,
+            secret
+          )
         }
-      ).then(async response => {
-        if (response.status === 204) {
-          trackEvent(segmentKey, "Signed Out", { accessToken: mvpd }, "Welcome");
-          goToScreen('LOADING')
-        }
-      }).catch(err => console.log(err))
-    });
+      }
+    ).then(async response => {
+      if (response.status === 204) {
+        trackEvent(segmentKey, "Signed Out", { accessToken: mvpd }, "Welcome");
+        await localStorage.setItem(
+          adobeToken,
+          'undefined',
+          namespace
+        );
+        goToScreen('LOADING')
+      }
+    }).catch(err => console.log(err))
   }
 
   if (Platform.OS === 'android') {
-    useInitialFocus(true, logoutButton);
+    useInitialFocus(forceFocus || focused, logoutButton);
+    forceFocus = false;
   }
 
   return (
     <Layout>
       <View style={styles.container}>
         <Text style={styles.text}>You've signed in with your TV Provider </Text>
-        <Text style={{ ...styles.text, textAlign: 'center', fontWeight: 'bold' }}>{mvpd}</Text>
         <Button
           label={'Sign Out'}
           preferredFocus={true}
-          groupId={groupId}
+          groupId={groupId || 'logout-group'}
           id="welcome-group"
           buttonRef={logoutButton}
           onPress={() => handleSignOut()}
+          nextFocusUp={parentFocus ? parentFocus.nextFocusUp : null}
           nextFocusLeft={parentFocus ? parentFocus.nextFocusLeft : null}
         />
       </View>
