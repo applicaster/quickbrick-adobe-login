@@ -1,4 +1,4 @@
- 
+ ### Deprecated - new version available https://github.com/applicaster/QuickBrick/tree/master/plugins/quick-brick-adobe-primetime-tv
 # Adobe Primetime Authentication 
 
 *Built by LATAM Team*
